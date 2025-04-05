@@ -1,0 +1,6 @@
+edu\eci\arsw\bomberman\controller\AuthController.class
+edu\eci\arsw\bomberman\repository\UserRepository.class
+edu\eci\arsw\bomberman\controller\WebController.class
+edu\eci\arsw\bomberman\model\User.class
+edu\eci\arsw\bomberman\service\AuthService.class
+edu\eci\arsw\bomberman\BombermanApplication.class
