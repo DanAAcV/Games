@@ -16,5 +16,13 @@ public class WebController {
         return "forward:/game.html";
     }
 
+    @GetMapping("/lobby")
+    public String lobby() {
+        return "forward:/lobby.html";
+    }
 
+    @GetMapping("/play")
+    public String play() {
+        return "forward:/play.html";
+    }
 }
