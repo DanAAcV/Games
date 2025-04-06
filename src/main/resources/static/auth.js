@@ -13,13 +13,16 @@ document.getElementById('registerBtn').addEventListener('click', async (e) => {
         });
 
         if (response.ok) {
-            window.location.href = "/game";
+            // Redirect to game page with user info
+            const token = await response.text(); // If you implement token response
+            window.location.href = "/game?user=" + encodeURIComponent(username);
         } else {
             const error = await response.text();
             document.getElementById('message').textContent = error;
         }
     } catch (error) {
         console.error("Error:", error);
+        document.getElementById('message').textContent = "Network error occurred";
     }
 });
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomberman Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            width: 800px;
+            height: 600px;
+            margin: 20px auto;
+            background-color: #333;
+            position: relative;
+        }
+        #welcome-message {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="welcome-message">
+    <h1>Welcome to Bomberman!</h1>
+    <p id="user-greeting"></p>
+</div>
+<div id="game-container">
+    <!-- Game will be rendered here -->
+</div>
+
+<script>
+    // Get username from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('user');
+    document.getElementById('user-greeting').textContent = `Hello, ${username || 'Player'}!`;
+
+    // Game initialization will go here
+    console.log('Game page loaded');
+</script>
+</body>
+</html>
