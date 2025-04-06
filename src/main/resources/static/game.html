@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bomberman Game</title>
+    <link rel="stylesheet" href="/styles.css">
     <style>
         body {
             margin: 0;
@@ -18,10 +19,52 @@
             margin: 20px auto;
             background-color: #333;
             position: relative;
+            display: none; /* Oculto inicialmente */
         }
         #welcome-message {
             text-align: center;
             padding: 20px;
+        }
+        #config-panel {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .config-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 250px;
+            margin-right: 10px;
+        }
+        input, select {
+            width: 100px;
+            padding: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #error-message {
+            color: #ff4444;
+            margin-top: 10px;
+        }
+        #config-summary {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -30,18 +73,47 @@
     <h1>Welcome to Bomberman!</h1>
     <p id="user-greeting"></p>
 </div>
+
+<div id="config-panel">
+    <h2>Game Configuration</h2>
+
+    <div class="config-group">
+        <label for="gameDuration">Game Duration (minutes):</label>
+        <select id="gameDuration">
+            <option value="2">2</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+        </select>
+    </div>
+
+    <div class="config-group">
+        <label for="playerCount">Number of Players (1-4):</label>
+        <input type="number" id="playerCount" min="1" max="4" value="2">
+    </div>
+
+    <div class="config-group">
+        <label for="blockCount">Number of Blocks (1-30):</label>
+        <input type="number" id="blockCount" min="1" max="30" value="15">
+    </div>
+
+    <div class="config-group">
+        <label for="livesCount">Lives per Player (1-10):</label>
+        <input type="number" id="livesCount" min="1" max="10" value="3">
+    </div>
+
+    <button id="startGameBtn">Start Game</button>
+    <div id="error-message"></div>
+
+    <div id="config-summary">
+        <h3>Current Configuration:</h3>
+        <p id="config-details"></p>
+    </div>
+</div>
+
 <div id="game-container">
     <!-- Game will be rendered here -->
 </div>
 
-<script>
-    // Get username from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('user');
-    document.getElementById('user-greeting').textContent = `Hello, ${username || 'Player'}!`;
-
-    // Game initialization will go here
-    console.log('Game page loaded');
-</script>
+<script src="/game.js"></script>
 </body>
 </html>

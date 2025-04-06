@@ -5,10 +5,9 @@ import edu.eci.arsw.bomberman.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*") // Permite CORS para desarrollo
 public class AuthController {
     private final AuthService authService;
 
@@ -17,23 +16,26 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody Map<String, String> credentials) {
-        String username = credentials.get("username");
-        String password = credentials.get("password");
-        if (authService.registerUser(username, password)) {
-            return ResponseEntity.ok("Registration successful");
+    public ResponseEntity<String> register(@RequestBody User user) {
+        try {
+            if (authService.registerUser(user.getUsername(), user.getPassword())) {
+                return ResponseEntity.ok("Registration successful");
+            }
+            return ResponseEntity.badRequest().body("Username already exists");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error during registration");
         }
-        return ResponseEntity.badRequest().body("Username already exists");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Map<String, String> credentials) {
-        String username = credentials.get("username");
-        String password = credentials.get("password");
-
-        if (authService.authenticateUser(username, password)) {
-            return ResponseEntity.ok("Login successful");
+    public ResponseEntity<String> login(@RequestBody User user) {
+        try {
+            if (authService.authenticateUser(user.getUsername(), user.getPassword())) {
+                return ResponseEntity.ok("Login successful");
+            }
+            return ResponseEntity.status(401).body("Invalid credentials");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error during authentication");
         }
-        return ResponseEntity.status(401).body("Invalid credentials");
     }
 }

@@ -1,3 +1,4 @@
+// Funcionalidad de autenticación (login y registro)
 document.getElementById('registerBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     const username = document.getElementById('username').value;
@@ -13,8 +14,7 @@ document.getElementById('registerBtn').addEventListener('click', async (e) => {
         });
 
         if (response.ok) {
-            // Redirect to game page with user info
-            const token = await response.text(); // If you implement token response
+            const token = await response.text();
             window.location.href = "/game?user=" + encodeURIComponent(username);
         } else {
             const error = await response.text();
@@ -36,16 +36,20 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
         });
 
         if (response.ok) {
-            window.location.href = "/game";
+            window.location.href = "/game?user=" + encodeURIComponent(username);
         } else {
             const error = await response.text();
             document.getElementById('message').textContent = error;
         }
     } catch (error) {
         console.error("Error:", error);
+        document.getElementById('message').textContent = "Network error occurred";
     }
 });
