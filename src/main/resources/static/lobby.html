@@ -6,13 +6,20 @@
     <title>Bomberman Lobby</title>
     <link rel="stylesheet" href="/styles.css">
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --text-color: white;
+            --background-dark: rgba(0, 0, 0, 0.7);
+        }
+
         body {
             margin: 0;
             padding: 0;
             background: url('/images/Begin.png') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Arial', sans-serif;
-            color: white;
+            color: var(--text-color);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -20,12 +27,14 @@
         }
 
         .lobby-container {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: var(--background-dark);
             padding: 30px;
             border-radius: 10px;
             width: 80%;
             max-width: 800px;
             text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--primary-color);
         }
 
         .game-info {
@@ -33,16 +42,53 @@
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: var(--primary-color);
         }
 
         .players-list {
-            margin: 20px 0;
+            margin: 25px 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        #players-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+        }
+
+        #players-list li {
+            padding: 8px;
+            margin: 5px 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .player-host {
+            color: var(--primary-color);
+            font-weight: bold;
         }
 
         #startBattleBtn {
             padding: 12px 24px;
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 6px;
@@ -50,11 +96,24 @@
             font-size: 16px;
             font-weight: bold;
             transition: all 0.3s ease;
+            margin-top: 15px;
         }
 
         #startBattleBtn:hover {
-            background-color: #45a049;
+            background-color: var(--primary-hover);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #startBattleBtn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #game-status {
+            font-weight: bold;
+            color: #FFC107;
         }
 
         .spinner {
@@ -62,7 +121,7 @@
             margin: 20px auto;
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top: 4px solid #4CAF50;
+            border-top: 4px solid var(--primary-color);
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
@@ -72,30 +131,68 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .game-info {
+                grid-template-columns: 1fr;
+            }
+
+            .lobby-container {
+                width: 95%;
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="lobby-container">
-    <h1 id="game-title">Game Lobby</h1>
+    <h1 id="game-title">Game Lobby: <span id="game-code"></span></h1>
+
     <div class="game-info">
         <div>
-            <p><strong>Scenario:</strong> <span id="scenario-display"></span></p>
-            <p><strong>Players:</strong> <span id="player-count"></span></p>
-            <p><strong>Duration:</strong> <span id="duration"></span> minutes</p>
+            <div class="info-item">
+                <span class="info-label">Scenario:</span>
+                <span id="scenario-display"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Players:</span>
+                <span id="player-count"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Duration:</span>
+                <span id="duration"></span> minutes
+            </div>
         </div>
         <div>
-            <p><strong>Blocks:</strong> <span id="block-count"></span></p>
-            <p><strong>Lives per player:</strong> <span id="lives-count"></span></p>
-            <p><strong>Status:</strong> <span id="game-status">Waiting for players...</span></p>
+            <div class="info-item">
+                <span class="info-label">Blocks:</span>
+                <span id="block-count"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Lives per player:</span>
+                <span id="lives-count"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Power-ups:</span>
+                <span id="powerups-count"></span>
+            </div>
         </div>
     </div>
+
     <div class="players-list">
         <h3>Current Players:</h3>
-        <ul id="players-list" style="list-style: none; padding: 0;"></ul>
+        <ul id="players-list"></ul>
     </div>
+
+    <div>
+        <span id="game-status">Waiting for players...</span>
+    </div>
+
     <button id="startBattleBtn" style="display: none;">¡Que comience la batalla!</button>
     <div class="spinner" id="loadingSpinner"></div>
 </div>
+
 <script src="/lobby.js"></script>
 </body>
 </html>
