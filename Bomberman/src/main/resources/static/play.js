@@ -114,8 +114,13 @@ window.addEventListener('DOMContentLoaded', () => {
         for (let r = 0; r < matrix.length; r++) {
             for (let c = 0; c < matrix[r].length; c++) {
                 const symbol = matrix[r][c];
-                const img = images[symbol];
-                if (img) ctx.drawImage(img, c * tileSize, r * tileSize, tileSize, tileSize);
+                if (symbol === "PB") {
+                    ctx.drawImage(images["B"], c * tileSize, r * tileSize, tileSize, tileSize);
+                    ctx.drawImage(images["P"], c * tileSize, r * tileSize, tileSize, tileSize);
+                } else {
+                    const img = images[symbol];
+                    if (img) ctx.drawImage(img, c * tileSize, r * tileSize, tileSize, tileSize);
+                }
             }
         }
     }
@@ -167,7 +172,7 @@ window.addEventListener('DOMContentLoaded', () => {
     function placeBomb() {
         if (bombPlaced) return;
         const [r, c] = playerPos;
-        matrix[r][c] = "B";
+        matrix[r][c] = "PB";
         bombPlaced = true;
         playerStats[player].bombsPlaced++;
         drawMatrix();
@@ -181,12 +186,18 @@ window.addEventListener('DOMContentLoaded', () => {
     function explodeBomb(row, col) {
         const dirs = [[0,0], [-1,0], [1,0], [0,-1], [0,1]];
         const exploded = [];
+        if (matrix[row][col] === "PB") matrix[row][col] = "E";
 
         for (let [dr, dc] of dirs) {
-            for (let i = 0; i <= (dr === 0 && dc === 0 ? 0 : 3); i++) {
+            for (let i = 0; i <= (dr === 0 && dc === 0 ? 0 : 2); i++) {
                 const r = row + dr * i;
                 const c = col + dc * i;
                 if (r < 0 || c < 0 || r >= matrix.length || c >= matrix[0].length) break;
+
+                if (matrix[r][c] === "PB") {
+                    exploded.push([r, c]);
+                    break; // bomba explota, no sigue más allá
+                }
 
                 const cell = matrix[r][c];
                 if (cell === "X") break;
@@ -216,9 +227,17 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         setTimeout(() => {
-            for (const [r, c] of exploded)
+            for (const [r, c] of exploded) {
                 if (matrix[r][c] === "E") matrix[r][c] = " ";
-            matrix[playerPos[0]][playerPos[1]] = "P";
+            }
+
+            const [pr, pc] = playerPos;
+            if (matrix[pr][pc] === " ") {
+                matrix[pr][pc] = "P";
+            } else if (matrix[pr][pc] === "B") {
+                matrix[pr][pc] = "PB"; // todavía estaba ahí
+            }
+
             drawMatrix();
         }, 1000);
     }
