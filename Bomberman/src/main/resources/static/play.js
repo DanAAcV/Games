@@ -34,11 +34,13 @@ window.addEventListener('DOMContentLoaded', () => {
     let currentLives = config.livesPerPlayer;
     let timerInterval;
 
-    const stats = {
-        lives: currentLives,
-        bombsPlaced: 0,
-        blocksDestroyed: 0,
-        powerUpsCollected: 0
+    const playerStats = {
+        [player]: {
+            lives: currentLives,
+            bombsPlaced: 0,
+            blocksDestroyed: 0,
+            powerUpsCollected: 0
+        }
     };
 
     function preloadImages(callback) {
@@ -78,7 +80,7 @@ window.addEventListener('DOMContentLoaded', () => {
         shuffle(inner);
         let idx = 0;
 
-        for (let i = 0; i < 75 && idx < inner.length; i++) matrix[inner[idx][0]][inner[idx++][1]] = "X";
+        for (let i = 0; i < 70 && idx < inner.length; i++) matrix[inner[idx][0]][inner[idx++][1]] = "X";
         for (let i = 0; i < cfg.blockCount && idx < inner.length;) {
             const [r, c] = inner[idx++];
             if (matrix[r][c] === " ") { matrix[r][c] = "#"; i++; }
@@ -118,19 +120,17 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function endGame(message) {
+    function endGame(message = null) {
         clearInterval(timerInterval);
-        alert(message);
+        const winnerText = message || (currentLives > 0 ? `🏅 ${player} wins!` : "Draw! No players survived.");
 
-        const summary = `
-🎮 Game Over!
-👤 Player: ${player}
-❤️ Lives: ${stats.lives}
-💣 Bombs: ${stats.bombsPlaced}
-🧱 Blocks Destroyed: ${stats.blocksDestroyed}
-⚡ Power-Ups: ${stats.powerUpsCollected}
-        `;
-        alert(summary);
+        const gameSummary = {
+            winnerText,
+            stats: playerStats
+        };
+
+        sessionStorage.setItem("gameSummary", JSON.stringify(gameSummary));
+        window.location.href = "/summary.html";
     }
 
     function startCountdown(minutes) {
@@ -138,7 +138,6 @@ window.addEventListener('DOMContentLoaded', () => {
         const timer = document.getElementById('timer');
         timerInterval = setInterval(() => {
             if (--total < 0) {
-                clearInterval(timerInterval);
                 endGame("⏱️ Time's up! It's a draw.");
                 return;
             }
@@ -170,7 +169,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const [r, c] = playerPos;
         matrix[r][c] = "B";
         bombPlaced = true;
-        stats.bombsPlaced++;
+        playerStats[player].bombsPlaced++;
         drawMatrix();
 
         setTimeout(() => {
@@ -192,12 +191,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 const cell = matrix[r][c];
                 if (cell === "X") break;
                 if (cell === "#") {
-                    stats.blocksDestroyed++;
+                    playerStats[player].blocksDestroyed++;
                     exploded.push([r, c]);
                     break;
                 }
 
-                if (cell === "!") stats.powerUpsCollected++;
+                if (cell === "!") playerStats[player].powerUpsCollected++;
                 exploded.push([r, c]);
             }
         }
@@ -205,11 +204,10 @@ window.addEventListener('DOMContentLoaded', () => {
         for (const [r, c] of exploded) matrix[r][c] = "E";
         drawMatrix();
 
-        // Daño al jugador
         const [pr, pc] = playerPos;
         if (exploded.some(([r, c]) => r === pr && c === pc)) {
             currentLives--;
-            stats.lives = currentLives;
+            playerStats[player].lives = currentLives;
             document.getElementById('lives').textContent = currentLives;
             if (currentLives <= 0) {
                 endGame("💀 You lost all your lives!");
