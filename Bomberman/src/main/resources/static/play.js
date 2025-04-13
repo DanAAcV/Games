@@ -7,6 +7,16 @@ window.addEventListener('DOMContentLoaded', () => {
         window.location.href = "/lobby.html";
         return;
     }
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    const currentPlayer = urlParams.get("user");
+    const allPlayers = JSON.parse(localStorage.getItem("players")); // ['Cordoba', 'Alejo']
+
+// Renderizar todos los jugadores
+    allPlayers.forEach((playerName, index) => {
+        const pos = getInitialPosition(index); // función que define la posición inicial para cada jugador
+        renderPlayerSprite(playerName, pos.x, pos.y);
+    });
 
     document.getElementById('gameCode').textContent = config.code;
     document.getElementById('playerName').textContent = player;
